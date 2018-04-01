@@ -4,12 +4,12 @@ const colors = require('colors');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 
-const MAIL_USER = process.env.MAIL_USER || 'info';
-const MAIL_PASS = process.env.MAIL_PASS || 'infopass';
-const MAIL_ADDR = process.env.MAIL_ADDR || 'info@info.com';
-const TO_MAIL_ADDR = process.env.TO_MAIL_ADDR || 'destiny@mail.com';
+const MAIL_USER = process.env.MAIL_USER;
+const MAIL_PASS = process.env.MAIL_PASS;
+const MAIL_ADDR = process.env.MAIL_ADDR;
+const TO_MAIL_ADDR = process.env.TO_MAIL_ADDR;
 
-const MAIL_SMTP = process.env.MAIL_SMTP || 'smtp.info.com';
+const MAIL_SMTP = process.env.MAIL_SMTP;
 const MAIL_PORT = process.env.MAIL_PORT || 465;
 const MAIL_SECURE = process.env.MAIL_SECURE || true;
 
@@ -29,6 +29,14 @@ colors.setTheme({
 });
 
 const app = express();
+
+// CORS header securiy
+app.all('/*', function (req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header('Access-Control-Allow-Methods', 'POST');
+	res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
+	next();
+});
 
 app.use(bodyParser.urlencoded({
 	extended: false
@@ -53,7 +61,7 @@ const sendConfirmationEmail = (contact) => {
 	const name = contact.name;
 	const website = contact.website;
 	const email = contact.email;
-	const msg = contact.msg;
+	const msg = contact.description;
 	
 	const mail = `
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
@@ -85,7 +93,7 @@ const sendConfirmationEmail = (contact) => {
 	</html>`;
 	
 	const mailOptions = {
-		from: email, // sender address
+		from: MAIL_ADDR, // sender address
 		to: TO_MAIL_ADDR, // list of receivers
 		subject: 'Attorney Assistance Contact Request', // Subject line
 		//text: 'Hello world1?', // plain text body
